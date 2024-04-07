@@ -2,8 +2,8 @@ from typing import List
 
 from fastapi import FastAPI
 
-from app.config import user, password, host, port, database_name
-from models import User_Pydantic, UserIn_Pydantic, Users
+from src.config import user, password, host, port, database_name
+from src.models import User_Pydantic, UserIn_Pydantic, Users
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException
 
@@ -21,6 +21,7 @@ async def get_users():
     return await User_Pydantic.from_queryset(Users.all())
 
 
+@app.post("/users")
 @app.post("/users", response_model=User_Pydantic)
 async def create_user(user: UserIn_Pydantic):
     user_obj = await Users.create(**user.model_dump(exclude_unset=True))
@@ -45,11 +46,10 @@ async def delete_user(user_id: int):
         raise HTTPException(status_code=404, detail=f"User {user_id} not found")
     return Status(message=f"Deleted user {user_id}")
 
-
 register_tortoise(
     app,
     db_url=f"postgres://{user}:{password}@{host}:{port}/{database_name}",
-    modules={"models": ["models"]},
+    modules={"models": ["src.models"]},
     generate_schemas=True,
     add_exception_handlers=True,
 )
