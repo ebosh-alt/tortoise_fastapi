@@ -1,6 +1,8 @@
 from typing import List
 
 from fastapi import FastAPI
+
+from app.config import user, password, host, port, database_name
 from models import User_Pydantic, UserIn_Pydantic, Users
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException
@@ -46,9 +48,8 @@ async def delete_user(user_id: int):
 
 register_tortoise(
     app,
-    db_url="postgres://postgres:n164838i@localhost:5432/test",
+    db_url=f"postgres://{user}:{password}@{host}:{port}/{database_name}",
     modules={"models": ["models"]},
     generate_schemas=True,
     add_exception_handlers=True,
 )
-
